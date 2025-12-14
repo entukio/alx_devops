@@ -1,0 +1,41 @@
+name: List Files and Send Email
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  list-and-email:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: List files with ls -la
+      run: ls -la
+    
+    - name: Send email notification
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.EMAIL_SERVER }}
+        server_port: ${{ secrets.EMAIL_PORT }}
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: Repository ${{ github.repository }}
+        to: ${{ secrets.EMAIL_TO }}
+        from: ${{ secrets.EMAIL_FROM }}
+        body: |
+          GitHub Action completed for repository: ${{ github.repository }}
+          
+          Workflow: ${{ github.workflow }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          Triggered by: ${{ github.actor }}
+          
+          The ls -la command has been executed successfully.
+
+
